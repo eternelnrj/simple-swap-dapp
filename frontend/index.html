@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title> Simple Swap</title>
+    <script src="https://unpkg.com/moralis/dist/moralis.js"></script>
+</head>
+
+<body>
+
+    <button id="connect-btn"> Connect </button>
+    <button id="disconnect-btn"> Disconnect </button>
+
+
+    <label for="max slippage"> Enter max slippage in %: </label>
+    <input type="number" id="slippage" name="max slippage" min="0" value="1">
+
+    <button id="swap-btn"> Swap </button>
+
+    <br>
+    <input type="number" id="link-input" name="link" min="0" value="0">
+    <label for="link" id="link-swap-label-id"> LINK </label>
+
+    <br>
+    <button id="switch-btn"> Switch </button>
+    <br>
+    <input type="number" id="usdc-input" name="usdc" min="0" value="0">
+    <label for="usdc" id="usdc-swap-label-id"> USDC </label>
+
+    <br>
+    <button id="supply-btn"> Supply </button>
+    <input type="number" id="supply-link-input" name="supply-link-input" min="0" value="0">
+    <label for="supply-link-input" id="supply-link-id"> LINK </label>
+    <input type="number" id="supply-usdc-input" name="supply-usdc-input" min="0" value="0">
+    <label for="supply-usdc-input" id="supply-usdc-id"> USDC </label>
+
+
+    <button id="withdraw-btn"> Withdraw </button>
+    <input type="number" id="withdraw-liquidity-input" name="withdraw-liquidity-input" min="0" value="0">
+    <label for="withdraw-input" id="withdraw-liquidity-id"> LP-tokens </label>
+    <br>
+    <button id="initiate-pool-btn"> Initiate pool </button>
+    <br>
+    <br>
+    <button id="total-link-btn"> total link </button>
+    <button id="total-usdc-btn"> total usdc </button>
+    <button id="total-lp-btn"> total-lp-btn </button>
+    
+    <style>
+        body {
+          background-image: url('images/bitcoin.png');
+          background-repeat: no-repeat;
+        }
+        </style>
+
+    <script src="./dist/bundle.js" type="text/javascript">  </script>
+    
+
+</body>
+
+</html>

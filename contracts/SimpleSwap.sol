@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 interface IERC20 {
     function transfer(address recipient, uint256 amount) external returns (bool);
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount) external returns (bool);
 }
 
 
@@ -19,15 +20,37 @@ contract SimpleSwap{
     address addressLink = 0xa36085F69e2889c224210F603D836748e7dC0088;   //Kovan address      //0x01BE23585060835E02B77ef475b0Cc51aA1e0709; rinkeby
     address addressUSDC = 0xb7a4F3E9097C08dA09517b5aB877F7a917224ede;    //Kovan address            //0xeb8f08a975Ab53E34D8a0330E0D34de942C95926; rinkeby
 
-    uint256 totalAvailableLink = 0;
-    uint256 totalAvailableUSDC = 0;
+    uint256 public totalAvailableLink = 0;      //18 decimals
+    uint256 public totalAvailableUSDC = 0;       //6 decimals
 
-    uint256 totalLpTokens = 0;
+    uint256 public totalLpTokens = 0;               //6 decimals
+
+    bool isPoolInitiated = false;
 
     mapping(address => uint256) userToAmountLpTokens;
 
+
+    function initiatePool(uint256 amountLinkToSupply, uint256 amountUsdcToSupply) public {
+        require(!isPoolInitiated, "The pool was already initiated");
+        isPoolInitiated = true;
+        IERC20 Link = IERC20(addressLink);
+        IERC20 USDC = IERC20(addressUSDC);
+
+        require(Link.transferFrom(msg.sender, address(this), amountLinkToSupply), "Link amount unavailable.");
+        require(USDC.transferFrom(msg.sender, address(this), amountUsdcToSupply), "USDC amount unavailable.");
+
+        totalAvailableLink = totalAvailableLink.add(amountLinkToSupply);
+        totalAvailableUSDC = totalAvailableUSDC.add(amountUsdcToSupply);
+
+        totalLpTokens = amountUsdcToSupply;
+
+        userToAmountLpTokens[msg.sender] = userToAmountLpTokens[msg.sender].add(totalLpTokens);
+    }
+
+
     // Basic check: Done
     function swap(uint256 quantitySoldToken, uint256 minAmountPurchasedToken, Tokens tokenForSale) public {
+        require(isPoolInitiated, "The pool should be initiated first.");
         uint256 amountPurchasedToken = getAmountPurchasedToken(quantitySoldToken, tokenForSale);
         require(amountPurchasedToken >= minAmountPurchasedToken, "The amount of purchased token is lower than required.");
 
@@ -55,16 +78,17 @@ contract SimpleSwap{
 
     }
 
-
     // Basic check: Done
     function supply(uint256 amountLpTokens) public {
+        require(isPoolInitiated, "The pool should be initiated first.");
+        require(amountLpTokens > 0, "The amount of supplied lp tokens should be > 0.");
         (uint256 amountLinkPerLpToken, uint256 amountUsdcPerLpToken) = getLpTokenPrice();
 
         IERC20 Link = IERC20(addressLink);
         IERC20 USDC = IERC20(addressUSDC);
 
-        uint256 amountLinkToSupply = amountLinkPerLpToken.mul(amountLpTokens);
-        uint256 amountUSDCToSupply = amountUsdcPerLpToken.mul(amountLpTokens);
+        uint256 amountLinkToSupply = amountLinkPerLpToken.mul(amountLpTokens).div(10 ** 6); // 18 decimals
+        uint256 amountUSDCToSupply = amountUsdcPerLpToken.mul(amountLpTokens).div(10 ** 6); // 6 decimals
 
         totalAvailableLink = totalAvailableLink.add(amountLinkToSupply);
         totalAvailableUSDC = totalAvailableUSDC.add(amountUSDCToSupply);
@@ -80,11 +104,13 @@ contract SimpleSwap{
 
     // Basic check: Done
     function withdraw(uint256 amountLpTokens) public {
+        require(isPoolInitiated, "The pool should be initiated first.");
+        require(amountLpTokens > 0, "The amount of requested lp tokens should be > 0.");
         require(userToAmountLpTokens[msg.sender] >= amountLpTokens, "You don't have enough LP tokens.");
         (uint256 amountLinkPerLpToken, uint256 amountUSDCPerLpToken)  = getLpTokenPrice();
 
-        uint256 amountLinkToWithdraw = amountLinkPerLpToken.mul(amountLpTokens);
-        uint256 amountUSDCToWithdraw = amountUSDCPerLpToken.mul(amountLpTokens);
+        uint256 amountLinkToWithdraw = amountLinkPerLpToken.mul(amountLpTokens).div(10 ** 6);
+        uint256 amountUSDCToWithdraw = amountUSDCPerLpToken.mul(amountLpTokens).div(10 ** 6);
 
         totalAvailableLink = totalAvailableLink.sub(amountLinkToWithdraw);
         totalAvailableUSDC = totalAvailableUSDC.sub(amountUSDCToWithdraw);
@@ -104,23 +130,23 @@ contract SimpleSwap{
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Link - USDC                      // 18 decimals
+    // Link - USDC                      // 6 decimals
     function getAmountPurchasedToken(uint256 amount, Tokens tokenForSale) internal view returns(uint256)
     {
         uint256 y = (tokenForSale == Tokens.Link) ? totalAvailableUSDC : totalAvailableLink;
         uint256 x = (tokenForSale == Tokens.Link) ? totalAvailableLink : totalAvailableUSDC;
 
-        uint256 C = totalAvailableUSDC * totalAvailableLink;         // 36 decimals
-        uint256 amountPurchasedTokens = y.sub(C.div(x + amount)); 
+        uint256 C = totalAvailableUSDC * totalAvailableLink;         // 24 decimals
+        uint256 amountPurchasedTokens = y.sub(C.div(x + amount)); // 6 or 18 decimals
 
         return amountPurchasedTokens;
     }
 
 
 
-    function getLpTokenPrice() internal view returns(uint256, uint256) 
+    function getLpTokenPrice() public view returns(uint256, uint256) 
     {
-        return (totalAvailableLink.div(totalLpTokens), totalAvailableUSDC.div(totalLpTokens));
+        return (totalAvailableLink.mul(10 ** 6).div(totalLpTokens), totalAvailableUSDC.mul(10 ** 6).div(totalLpTokens));
     }
 
 

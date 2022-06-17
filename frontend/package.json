@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "bignumber": "^1.1.0",
+    "bignumber.js": "^9.0.2",
+    "browserify": "^17.0.0"
+  }
+}
