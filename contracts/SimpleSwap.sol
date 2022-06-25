@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
-
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface IERC20 {
     function transfer(address recipient, uint256 amount) external returns (bool);
@@ -12,7 +11,7 @@ interface IERC20 {
 }
 
 
-contract SimpleSwap{
+contract SimpleSwap is Ownable{
     using SafeMath for uint256;
 
     enum Tokens{Link, USDC}
@@ -21,16 +20,19 @@ contract SimpleSwap{
     address addressUSDC = 0xb7a4F3E9097C08dA09517b5aB877F7a917224ede;    //Kovan address            //0xeb8f08a975Ab53E34D8a0330E0D34de942C95926; rinkeby
 
     uint256 public totalAvailableLink = 0;      //18 decimals
-    uint256 public totalAvailableUSDC = 0;       //6 decimals
+    uint256 public totalAvailableUSDC = 0;      //6 decimals
 
-    uint256 public totalLpTokens = 0;               //6 decimals
+    uint256  public totalLpTokens = 0;           //6 decimals
+
+    uint256 public FEE = 3 * 10 ** 3;         //6 decimals
 
     bool isPoolInitiated = false;
 
     mapping(address => uint256) userToAmountLpTokens;
 
+ 
 
-    function initiatePool(uint256 amountLinkToSupply, uint256 amountUsdcToSupply) public {
+    function initiatePool(uint256 amountLinkToSupply, uint256 amountUsdcToSupply) public onlyOwner {
         require(!isPoolInitiated, "The pool was already initiated");
         isPoolInitiated = true;
         IERC20 Link = IERC20(addressLink);
@@ -45,6 +47,7 @@ contract SimpleSwap{
         totalLpTokens = amountUsdcToSupply;
 
         userToAmountLpTokens[msg.sender] = userToAmountLpTokens[msg.sender].add(totalLpTokens);
+        
     }
 
 
@@ -139,7 +142,7 @@ contract SimpleSwap{
         uint256 C = totalAvailableUSDC * totalAvailableLink;         // 24 decimals
         uint256 amountPurchasedTokens = y.sub(C.div(x + amount)); // 6 or 18 decimals
 
-        return amountPurchasedTokens;
+        return amountPurchasedTokens * (10 ** 6 - FEE) / 10 ** 6;
     }
 
 
