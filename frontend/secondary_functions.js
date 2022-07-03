@@ -20,11 +20,9 @@ function getBigNumberWithDecimals(x, numberDecimals) {
     x = parseFloat(x).toFixed(numberDecimals);
     let xAsBigNumber = new BigNumber(x.toString());
     let yAsBigNumberWithDecimals = new BigNumber("1".concat("0".repeat(numberDecimals) ));
-    return xAsBigNumber.multipliedBy(yAsBigNumberWithDecimals);//xAsBigNumber; //xAsBigNumber.multipliedBy(yAsBigNumberWithDecimals);
+    return xAsBigNumber.multipliedBy(yAsBigNumberWithDecimals);
   }    
   
-
-// returns  BigNumber
 async function getTotalAvailableLinkBigNumberWithDecimals() {
   
     const readOptionsTotalAvailableLink = {
@@ -35,13 +33,10 @@ async function getTotalAvailableLinkBigNumberWithDecimals() {
   
     const totalAvailableLink = await Moralis.executeFunction(readOptionsTotalAvailableLink);
     const totalAvailableLinkBigNumber = new BigNumber(totalAvailableLink.toString());
-    //console.log(totalAvailableLinkBigNumber.shiftedBy(-18).toNumber());
   
     return totalAvailableLinkBigNumber;
   }
   
-
-// returns BigNumber
 async function getTotalAvailableUsdcBigNumberWithDecimals() {
   const readOptionsTotalAvailableUSDC = {
     contractAddress: simpleSwapInfo["contractAddress"],
@@ -54,7 +49,6 @@ async function getTotalAvailableUsdcBigNumberWithDecimals() {
   const totalAvailableUSDCBigNumber = new BigNumber(totalAvailableUSDC.toString());
   return totalAvailableUSDCBigNumber;
 }
-
   
 async function getTotalAmountLpTokensBigNumberWithDecimals() {
     const readOptionsTotalLpTokens = {
@@ -69,7 +63,6 @@ async function getTotalAmountLpTokensBigNumberWithDecimals() {
     return totalAmountLpTokensBigNumber;
 }
 
-
 function reverseButtons(tokenForSale) {
     const linkInput = document.getElementById("link-input");
     const usdcInput = document.getElementById("usdc-input");
@@ -77,11 +70,11 @@ function reverseButtons(tokenForSale) {
     linkInput.name = "usdc";
     linkInput.id = "usdc-input";
     linkInput.value = 0;
-    linkInput.onchange = async () => {console.log("(usdc inp) tokenForSale: " + tokenForSale ); await changeLinkInput(tokenForSale); changeMinAmountReceived(tokenForSale);};
+    linkInput.onchange = async () => {await changeLinkInput(tokenForSale); changeMinAmountReceived(tokenForSale);};
   
     usdcInput.name = "link";
     usdcInput.id = "link-input";
-    usdcInput.onchange = async () => {console.log("(link inp) tokenForSale: " + tokenForSale ); await changeUsdcInput(tokenForSale); changeMinAmountReceived(tokenForSale);};
+    usdcInput.onchange = async () => {await changeUsdcInput(tokenForSale); changeMinAmountReceived(tokenForSale);};
     usdcInput.value = 0;
 
     const linkLabel = document.getElementById("link-swap-label-id");

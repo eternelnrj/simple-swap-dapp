@@ -8814,11 +8814,9 @@ var _price_functions = require("./price_functions.js");
 
 async function changeUsdcInput(tokenForSale) {
   if (tokenForSale == 0) {
-    console.log("tokenForSale: " + tokenForSale);
     const amountUsdc = await (0, _price_functions.calculateAmountPurchasedToken)(document.getElementById("link-input").value, tokenForSale);
     document.getElementById("usdc-input").value = amountUsdc;
   } else {
-    console.log("tokenForSale: " + tokenForSale);
     const amountUsdc = await (0, _price_functions.calculateAmountSoldToken)(document.getElementById("link-input").value, tokenForSale);
     document.getElementById("usdc-input").value = amountUsdc;
   }
@@ -8826,11 +8824,9 @@ async function changeUsdcInput(tokenForSale) {
 
 async function changeLinkInput(tokenForSale) {
   if (tokenForSale == 0) {
-    console.log("tokenForSale: " + tokenForSale);
     const amountLink = await (0, _price_functions.calculateAmountSoldToken)(document.getElementById("usdc-input").value, tokenForSale);
     document.getElementById("link-input").value = amountLink;
   } else {
-    console.log("tokenForSale: " + tokenForSale);
     const amountLink = await (0, _price_functions.calculateAmountPurchasedToken)(document.getElementById("usdc-input").value, tokenForSale);
     document.getElementById("link-input").value = amountLink;
   }
@@ -8912,15 +8908,6 @@ async function connect() {
     await Moralis.authenticate({
       signingMessage: "Log in using Moralis"
     });
-  } //localStorage.setItem("moralis", JSON.stringify(Moralis));
-
-}
-
-async function disconnect() {
-  let user = Moralis.User.current();
-
-  if (user) {
-    Moralis.User.logOut();
   }
 }
 
@@ -8938,7 +8925,7 @@ async function swap() {
     const soldTokenContractAdress = tokenForSale == 0 ? _contracts_and_abi.linkInfo["contractAddress"] : _contracts_and_abi.usdcInfo["contractAddress"];
     const soldTokenAbi = tokenForSale == 0 ? _contracts_and_abi.linkInfo["abi"] : _contracts_and_abi.usdcInfo["abi"];
     const tx = await (0, _secondary_functions.approve)(amountSoldTokenStr, _contracts_and_abi.simpleSwapInfo["contractAddress"], soldTokenContractAdress, soldTokenAbi);
-    tx.wait(1);
+    await tx.wait(1);
     const writeOptionsSwap = {
       contractAddress: _contracts_and_abi.simpleSwapInfo["contractAddress"],
       functionName: "swap",
@@ -8956,19 +8943,14 @@ async function swap() {
 async function supply() {
   const amountUsdc = parseFloat(document.getElementById("supply-usdc-input").value);
   const amountLink = parseFloat(document.getElementById("supply-link-input").value);
-  console.log("amountUsdc: " + amountUsdc);
-  console.log("amountLink: " + amountLink);
   const [priceLinkLpToken, priceUsdcLpToken] = await (0, _price_functions.getLpTokenPriceBigNumberWithDecimals)();
   const amountLpTokens = Math.min(amountLink / priceLinkLpToken.shiftedBy(-18).toNumber(), amountUsdc / priceUsdcLpToken.shiftedBy(-6).toNumber());
-  console.log("amountLpTokens: " + amountLpTokens);
   const allowedAmountUsdcStr = priceUsdcLpToken.multipliedBy(amountLpTokens).multipliedBy(1.1).toFixed(0).toString();
   const allowedAmountLinkStr = priceLinkLpToken.multipliedBy(amountLpTokens).multipliedBy(1.1).toFixed(0).toString();
-  console.log("allowedAmountUsdcStr: " + allowedAmountUsdcStr);
-  console.log("allowedAmountLinkStr: " + allowedAmountLinkStr);
   const txUsdc = await (0, _secondary_functions.approve)(allowedAmountUsdcStr, _contracts_and_abi.simpleSwapInfo["contractAddress"], _contracts_and_abi.usdcInfo["contractAddress"], _contracts_and_abi.usdcInfo["abi"]);
-  txUsdc.wait(1);
+  await txUsdc.wait(1);
   const txLink = await (0, _secondary_functions.approve)(allowedAmountLinkStr, _contracts_and_abi.simpleSwapInfo["contractAddress"], _contracts_and_abi.linkInfo["contractAddress"], _contracts_and_abi.linkInfo["abi"]);
-  txLink.wait(1);
+  await txLink.wait(1);
   const amountLpTokensWithDecimalsStr = (0, _secondary_functions.getBigNumberWithDecimals)(amountLpTokens, 6).toString();
   const writeOptionsSupply = {
     contractAddress: _contracts_and_abi.simpleSwapInfo["contractAddress"],
@@ -8993,31 +8975,24 @@ async function withdraw() {
     }
   };
   await Moralis.executeFunction(writeOptionsWithdraw);
-} //export {Moralis};
+}
 
-
-document.getElementById("connect-btn").onclick = connect; //document.getElementById("disconnect-btn").onclick = disconnect;
-
+document.getElementById("connect-btn").onclick = connect;
 document.getElementById("swap-btn").onclick = swap;
+document.getElementById("supply-btn").onclick = supply;
+document.getElementById("withdraw-btn").onclick = withdraw;
 
 document.getElementById("switch-btn").onclick = () => {
   tokenForSale = (tokenForSale + 1) % 2;
   (0, _secondary_functions.reverseButtons)(tokenForSale);
-  console.log("(switch 0) tokenForSale: " + tokenForSale);
-  console.log("(switch 1) tokenForSale: " + tokenForSale);
 };
 
-document.getElementById("supply-btn").onclick = supply;
-document.getElementById("withdraw-btn").onclick = withdraw;
-
 document.getElementById("link-input").onchange = async () => {
-  console.log("(link inp) tokenForSale: " + tokenForSale);
   await (0, _autocompletion_functions.changeUsdcInput)(tokenForSale);
   (0, _autocompletion_functions.changeMinAmountReceived)(tokenForSale);
 };
 
 document.getElementById("usdc-input").onchange = async () => {
-  console.log("(usdc inp) tokenForSale: " + tokenForSale);
   await (0, _autocompletion_functions.changeLinkInput)(tokenForSale);
   (0, _autocompletion_functions.changeMinAmountReceived)(tokenForSale);
 };
@@ -9032,12 +9007,7 @@ document.getElementById("supply-link-input").onchange = async () => {
 
 document.getElementById("slippage").onchange = () => {
   (0, _autocompletion_functions.changeMinAmountReceived)(tokenForSale);
-}; //document.getElementById("total-link-btn").onclick = async () => {const totalLinkBigNumberWithDecimals = await getTotalAvailableLinkBigNumberWithDecimals;
-//console.log(totalLinkBigNumberWithDecimals.shiftedBy(-18).toNumber()) ;};
-//document.getElementById("total-usdc-btn").onclick = async () => {const totalUsdcBigNumberWithDecimals = await getTotalAvailableUsdcBigNumberWithDecimals;
-//console.log(totalUsdcBigNumberWithDecimals.shiftedBy(-6).toNumber()); }
-//document.getElementById("total-lp-btn").onclick =  async () => {const totalAmountLpTokensBigNumberWithDecimals  = await getTotalAmountLpTokensBigNumberWithDecimals(); 
-//                                                                console.log(totalAmountLpTokensBigNumberWithDecimals.shiftedBy(-6).toNumber());   }
+};
 
 },{"./.config.json":3,"./autocompletion_functions.js":4,"./contracts_and_abi.js":5,"./price_functions.js":8,"./secondary_functions.js":9}],7:[function(require,module,exports){
 ;(function (globalObject) {
@@ -11959,49 +11929,37 @@ var _secondary_functions = require("./secondary_functions.js");
 
 var _contracts_and_abi = require("./contracts_and_abi.js");
 
-const BigNumber = require('bignumber.js'); // getAmountPurchasedToken(amountSoldToken, tokenForSale)
-// (x + dx ) ( y - dy) = cst
+const BigNumber = require('bignumber.js'); // (x + dx ) ( y - dy) = cst
 // return y - cst / (x + dx)
 
 
 async function calculateAmountPurchasedToken(amountSoldToken, tokenForSale) {
   // x : sold token 
   // y : purchased token
-  console.log("entering calculateAmountPurchasedToken");
   const totalLinkAvaialbe = await (0, _secondary_functions.getTotalAvailableLinkBigNumberWithDecimals)();
   const totalUsdcAvailable = await (0, _secondary_functions.getTotalAvailableUsdcBigNumberWithDecimals)();
-  console.log("totalLinkAvaialbe: " + totalLinkAvaialbe.shiftedBy(-18).toNumber());
-  console.log("totalUsdcAvailable: " + totalUsdcAvailable.shiftedBy(-6).toNumber());
   const numberDecimalsSoldToken = tokenForSale == 0 ? 18 : 6;
   const numberDecimalsPurchasedToken = tokenForSale == 0 ? 6 : 18;
   const x = tokenForSale == 0 ? totalLinkAvaialbe : totalUsdcAvailable;
   const y = tokenForSale == 0 ? totalUsdcAvailable : totalLinkAvaialbe;
   const d_x = (0, _secondary_functions.getBigNumberWithDecimals)(amountSoldToken, numberDecimalsSoldToken);
   const d_y = y.minus(totalLinkAvaialbe.multipliedBy(totalUsdcAvailable).dividedBy(x.plus(d_x)));
-  console.log("d_y: " + d_y.shiftedBy(-numberDecimalsPurchasedToken).toNumber());
-  console.log("d_x: " + d_x.shiftedBy(-numberDecimalsSoldToken).toNumber());
   return d_y.shiftedBy(-numberDecimalsPurchasedToken).toNumber();
 } // (x + dx ) ( y - dy) = cst
 // return cst / (y - dy) - x
 
 
 async function calculateAmountSoldToken(amountPurchasedToken, tokenForSale) {
-  console.log("entering calculateAmountPurchasedToken");
   const totalLinkAvaialbe = await (0, _secondary_functions.getTotalAvailableLinkBigNumberWithDecimals)();
   const totalUsdcAvailable = await (0, _secondary_functions.getTotalAvailableUsdcBigNumberWithDecimals)();
-  console.log("totalLinkAvaialbe: " + totalLinkAvaialbe.shiftedBy(-18).toNumber());
-  console.log("totalUsdcAvailable: " + totalUsdcAvailable.shiftedBy(-6).toNumber());
   const numberDecimalsSoldToken = tokenForSale == 0 ? 18 : 6;
   const numberDecimalsPurchasedToken = tokenForSale == 0 ? 6 : 18;
   const x = tokenForSale == 0 ? totalLinkAvaialbe : totalUsdcAvailable;
   const y = tokenForSale == 0 ? totalUsdcAvailable : totalLinkAvaialbe;
   const d_y = (0, _secondary_functions.getBigNumberWithDecimals)(amountPurchasedToken, numberDecimalsPurchasedToken);
   const d_x = totalLinkAvaialbe.multipliedBy(totalUsdcAvailable).dividedBy(y.minus(d_y)).minus(x);
-  console.log("d_y: " + d_y.shiftedBy(-numberDecimalsPurchasedToken).toNumber());
-  console.log("d_x: " + d_x.shiftedBy(-numberDecimalsSoldToken).toNumber());
   return d_x.shiftedBy(-numberDecimalsSoldToken).toNumber();
-} // returns BigNumber
-
+}
 
 async function getLpTokenPriceBigNumberWithDecimals() {
   const readOptionsGetLpTokenPrice = {
@@ -12049,9 +12007,8 @@ function getBigNumberWithDecimals(x, numberDecimals) {
   x = parseFloat(x).toFixed(numberDecimals);
   let xAsBigNumber = new BigNumber(x.toString());
   let yAsBigNumberWithDecimals = new BigNumber("1".concat("0".repeat(numberDecimals)));
-  return xAsBigNumber.multipliedBy(yAsBigNumberWithDecimals); //xAsBigNumber; //xAsBigNumber.multipliedBy(yAsBigNumberWithDecimals);
-} // returns  BigNumber
-
+  return xAsBigNumber.multipliedBy(yAsBigNumberWithDecimals);
+}
 
 async function getTotalAvailableLinkBigNumberWithDecimals() {
   const readOptionsTotalAvailableLink = {
@@ -12060,11 +12017,9 @@ async function getTotalAvailableLinkBigNumberWithDecimals() {
     abi: _contracts_and_abi.simpleSwapInfo["abi"]
   };
   const totalAvailableLink = await Moralis.executeFunction(readOptionsTotalAvailableLink);
-  const totalAvailableLinkBigNumber = new BigNumber(totalAvailableLink.toString()); //console.log(totalAvailableLinkBigNumber.shiftedBy(-18).toNumber());
-
+  const totalAvailableLinkBigNumber = new BigNumber(totalAvailableLink.toString());
   return totalAvailableLinkBigNumber;
-} // returns BigNumber
-
+}
 
 async function getTotalAvailableUsdcBigNumberWithDecimals() {
   const readOptionsTotalAvailableUSDC = {
@@ -12096,7 +12051,6 @@ function reverseButtons(tokenForSale) {
   linkInput.value = 0;
 
   linkInput.onchange = async () => {
-    console.log("(usdc inp) tokenForSale: " + tokenForSale);
     await (0, _autocompletion_functions.changeLinkInput)(tokenForSale);
     (0, _autocompletion_functions.changeMinAmountReceived)(tokenForSale);
   };
@@ -12105,7 +12059,6 @@ function reverseButtons(tokenForSale) {
   usdcInput.id = "link-input";
 
   usdcInput.onchange = async () => {
-    console.log("(link inp) tokenForSale: " + tokenForSale);
     await (0, _autocompletion_functions.changeUsdcInput)(tokenForSale);
     (0, _autocompletion_functions.changeMinAmountReceived)(tokenForSale);
   };
