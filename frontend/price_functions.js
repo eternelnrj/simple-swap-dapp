@@ -2,12 +2,10 @@ import {getTotalAvailableLinkBigNumberWithDecimals, getTotalAvailableUsdcBigNumb
 import {simpleSwapInfo} from "./contracts_and_abi.js";
 
 const BigNumber = require('bignumber.js');
-
 // (x + dx ) ( y - dy) = cst
 // return y - cst / (x + dx)
 
 async function calculateAmountPurchasedToken(amountSoldToken, tokenForSale) {
-
     // x : sold token 
     // y : purchased token
     const totalLinkAvaialbe = await getTotalAvailableLinkBigNumberWithDecimals();

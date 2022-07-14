@@ -14,7 +14,6 @@ let tokenForSale = 0;
 
 if (Moralis.User.current()){ Moralis.User.logOut(); };
 
-
 async function connect() { 
     if (!Moralis.User.current()) {
       await Moralis.authenticate({
@@ -24,10 +23,9 @@ async function connect() {
   }
 
 async function swap() {
-  const amountSoldToken = (tokenForSale == 0) ? document.getElementById("link-input").value : document.getElementById("usdc-input").value;
+  const amountSoldToken = (tokenForSale == 0) ? parseFloat(document.getElementById("link-input").value) : parseFloat(document.getElementById("usdc-input").value);
 
-  if (amountSoldToken <= 0)
-    {
+  if (amountSoldToken <= 0) {
       console.log("The amount of token sold should be > 0!");
     }
     
@@ -37,14 +35,14 @@ async function swap() {
     const numberDecimalsSoldToken = (tokenForSale == 0) ? 18 : 6;
     const numberDecimalsPurchasedToken = (tokenForSale == 0) ? 6 : 18;
 
-    const amountSoldTokenStr = getBigNumberWithDecimals(amountSoldToken, numberDecimalsSoldToken).multipliedBy(1.1).toString();
+    const amountSoldTokenStr = getBigNumberWithDecimals(amountSoldToken, numberDecimalsSoldToken).toString();
     const minAmountPurchasedTokenStr = getBigNumberWithDecimals(minAmountPurchasedToken, numberDecimalsPurchasedToken).toString();
       
     const soldTokenContractAdress = (tokenForSale == 0) ? linkInfo["contractAddress"] : usdcInfo["contractAddress"];
     const soldTokenAbi = (tokenForSale == 0) ? linkInfo["abi"] : usdcInfo["abi"];
 
     const tx = await approve(amountSoldTokenStr, simpleSwapInfo["contractAddress"], soldTokenContractAdress, soldTokenAbi);
-    await tx.wait(1);
+    await tx.wait();
 
     const writeOptionsSwap = {
       contractAddress: simpleSwapInfo["contractAddress"],
@@ -74,10 +72,10 @@ async function supply() {
   const allowedAmountLinkStr = priceLinkLpToken.multipliedBy(amountLpTokens).multipliedBy(1.1).toFixed(0).toString();
 
   const txUsdc = await approve(allowedAmountUsdcStr, simpleSwapInfo["contractAddress"], usdcInfo["contractAddress"], usdcInfo["abi"]);
-  await txUsdc.wait(1);
+  await txUsdc.wait();
 
   const txLink = await approve(allowedAmountLinkStr, simpleSwapInfo["contractAddress"], linkInfo["contractAddress"], linkInfo["abi"]);
-  await txLink.wait(1);
+  await txLink.wait();
 
   const amountLpTokensWithDecimalsStr = getBigNumberWithDecimals(amountLpTokens, 6).toString();
 

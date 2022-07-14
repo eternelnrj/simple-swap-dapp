@@ -1,37 +1,38 @@
 import {calculateAmountPurchasedToken, calculateAmountSoldToken, getLpTokenPriceBigNumberWithDecimals} from "./price_functions.js"
 
+const NUMBER_DECIMALS = 6;
 
 async function changeUsdcInput(tokenForSale) {
     if (tokenForSale == 0) {
-      const amountUsdc = await calculateAmountPurchasedToken(document.getElementById("link-input").value, tokenForSale);
-      document.getElementById("usdc-input").value = amountUsdc;
+      const amountUsdc = await calculateAmountPurchasedToken(parseFloat(document.getElementById("link-input").value), tokenForSale);
+      document.getElementById("usdc-input").value = amountUsdc.toFixed(NUMBER_DECIMALS);
     }
     else {
-      const amountUsdc = await calculateAmountSoldToken(document.getElementById("link-input").value, tokenForSale);
-      document.getElementById("usdc-input").value  = amountUsdc;
+      const amountUsdc = await calculateAmountSoldToken(parseFloat(document.getElementById("link-input").value), tokenForSale);
+      document.getElementById("usdc-input").value  = amountUsdc.toFixed(NUMBER_DECIMALS);
     }
   
   }
   
 async function changeLinkInput(tokenForSale) {
     if (tokenForSale == 0) {
-      const amountLink = await calculateAmountSoldToken(document.getElementById("usdc-input").value, tokenForSale);
-      document.getElementById("link-input").value = amountLink;
+      const amountLink = await calculateAmountSoldToken(parseFloat(document.getElementById("usdc-input").value), tokenForSale);
+      document.getElementById("link-input").value = amountLink.toFixed(NUMBER_DECIMALS);
     }
     else {
-      const amountLink = await calculateAmountPurchasedToken(document.getElementById("usdc-input").value, tokenForSale);
-      document.getElementById("link-input").value  = amountLink;
+      const amountLink = await calculateAmountPurchasedToken(parseFloat(document.getElementById("usdc-input").value), tokenForSale);
+      document.getElementById("link-input").value  = amountLink.toFixed(NUMBER_DECIMALS);
     }
 }
   
 function changeMinAmountReceived(tokenForSale){
-    const amountOfPurchasedToken = (tokenForSale == 0) ? document.getElementById("usdc-input").value : document.getElementById("link-input").value;
-    const maxSlippage = document.getElementById("slippage").value;
+    const amountOfPurchasedToken = (tokenForSale == 0) ? parseFloat(document.getElementById("usdc-input").value) : parseFloat(document.getElementById("link-input").value);
+    const maxSlippage = parseFloat(document.getElementById("slippage").value);
     const minAmountPurchasedToken = amountOfPurchasedToken * (1 - maxSlippage/100);
   
     const tokenPurchasedStr = (tokenForSale == 0) ? "USDC" : "Link";
   
-    document.getElementById("min_amount_purchased_token").innerHTML = "Min amount of " +  tokenPurchasedStr + " to receive: " + minAmountPurchasedToken.toFixed(4).toString();
+    document.getElementById("min_amount_purchased_token").innerHTML = "Minimum amount of " +  tokenPurchasedStr + " to receive: " + minAmountPurchasedToken.toFixed(NUMBER_DECIMALS).toString();
     document.getElementById("min_amount_purchased_token").setAttribute("data-value", minAmountPurchasedToken);
   }
   

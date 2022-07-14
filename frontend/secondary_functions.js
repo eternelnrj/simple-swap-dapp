@@ -16,13 +16,12 @@ async function approve(amountBigNumberWithDecimalsStr, spenderAddress, contractA
   }
   
 function getBigNumberWithDecimals(x, numberDecimals) {
+    const xAsBigNumber = new BigNumber(x.toFixed(numberDecimals));
+    const ScalingFactorAsBigNumber = new BigNumber("1".concat("0".repeat(numberDecimals) ));
+    
+    return xAsBigNumber.multipliedBy(ScalingFactorAsBigNumber);
+}    
 
-    x = parseFloat(x).toFixed(numberDecimals);
-    let xAsBigNumber = new BigNumber(x.toString());
-    let yAsBigNumberWithDecimals = new BigNumber("1".concat("0".repeat(numberDecimals) ));
-    return xAsBigNumber.multipliedBy(yAsBigNumberWithDecimals);
-  }    
-  
 async function getTotalAvailableLinkBigNumberWithDecimals() {
   
     const readOptionsTotalAvailableLink = {
@@ -64,30 +63,31 @@ async function getTotalAmountLpTokensBigNumberWithDecimals() {
 }
 
 function reverseButtons(tokenForSale) {
+    console.log("entering reverse buttons");
+
     const linkInput = document.getElementById("link-input");
     const usdcInput = document.getElementById("usdc-input");
-  
-    linkInput.name = "usdc";
-    linkInput.id = "usdc-input";
-    linkInput.value = 0;
-    linkInput.onchange = async () => {await changeLinkInput(tokenForSale); changeMinAmountReceived(tokenForSale);};
-  
-    usdcInput.name = "link";
-    usdcInput.id = "link-input";
-    usdcInput.onchange = async () => {await changeUsdcInput(tokenForSale); changeMinAmountReceived(tokenForSale);};
-    usdcInput.value = 0;
 
     const linkLabel = document.getElementById("link-swap-label-id");
     const usdcLabel = document.getElementById("usdc-swap-label-id");
   
-    linkLabel.for = "usdc";
+    linkInput.id = "usdc-input";
+    linkInput.value = 0;
+    linkInput.onchange = async () => {await changeLinkInput(tokenForSale); changeMinAmountReceived(tokenForSale);};
+  
+    usdcInput.id = "link-input";
+    usdcInput.value = 0;
+    usdcInput.onchange = async () => {await changeUsdcInput(tokenForSale); changeMinAmountReceived(tokenForSale);};
+
+    
     linkLabel.id = "usdc-swap-label-id";
     linkLabel.innerHTML = "USDC";
+    linkLabel.setAttribute("for", "usdc-input"); 
   
-    usdcLabel.for = "link";
+    
     usdcLabel.id = "link-swap-label-id";
     usdcLabel.innerHTML = "LINK";
-   
+    usdcLabel.setAttribute("for", "link-input");
   }
 
 

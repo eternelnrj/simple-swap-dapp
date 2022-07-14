@@ -5,31 +5,25 @@
     <title> Simple Swap</title>
     <script src="https://unpkg.com/moralis/dist/moralis.js"></script>
     <script src="./dist/moralis.js"></script>
-
 </head>
 
 
 <body>
-
     <button id="connect-btn"> Connect </button>
-    
 
-    <label for="max slippage"> Enter max slippage in %: </label>
-    <input type="number" id="slippage" name="max slippage" min="0" value="1">
+    <label for="slippage"> Enter max slippage in %: </label>
+    <input type="number" id="slippage"  min="0" value="1">
     <br>
     <br>
-    
-
-
     <br>
-    <input type="number" id="link-input" name="link" min="0" value="0">
-    <label for="link" id="link-swap-label-id"> LINK </label>
+    <input type="number" id="link-input" min="0" value="0">
+    <label id="link-swap-label-id" for="link-input"> LINK </label>
 
     <br>
     <button id="switch-btn"> Switch </button>
     <br>
-    <input type="number" id="usdc-input" name="usdc" min="0" value="0">
-    <label for="usdc" id="usdc-swap-label-id"> USDC </label>
+    <input type="number" id="usdc-input" min="0" value="0">
+    <label id="usdc-swap-label-id" for="usdc-input"> USDC </label>
     <br>
     <button id="swap-btn"> Swap </button>
     <br>
@@ -38,7 +32,7 @@
     <br>
     <br>
 
-        
+    
     <button id="supply-btn"> Supply </button>
     <input type="number" id="supply-link-input" name="supply-link-input" min="0" value="0">
     <label for="supply-link-input" id="supply-link-id"> LINK </label>
@@ -46,7 +40,6 @@
     <label for="supply-usdc-input" id="supply-usdc-id"> USDC </label>
     <br>
     <br>
-
     <button id="withdraw-btn"> Withdraw </button>
     <input type="number" id="withdraw-liquidity-input" name="withdraw-liquidity-input" min="0" value="0">
     <label for="withdraw-input" id="withdraw-liquidity-id"> LP-tokens </label>
@@ -65,10 +58,6 @@
         </style>
 
     <script src="./dist/main.js" type="module">  </script>
-    <script src="./dist/price_functions.js" type="module">  </script>
-    <script src="./dist/secondary_functions.js" type="module">  </script>
-    <script src="./dist/autocompletion_functions.js" type="module">  </script>
-    <script type="module" src="./dist/contracts_and_abi.js" >   </script>
 
     
 
