@@ -1,6 +1,6 @@
 const simpleSwapInfo = {
-    "contractAddress" : "0xa2AEf78BD851D65cdBD3F14d3Bf814C211a50630",
-    "abi" : require("../build/deployments/42/0xa2AEf78BD851D65cdBD3F14d3Bf814C211a50630.json")["abi"]
+    "contractAddress" : "0x5CD98cDD838174E9523e561887E13A5123211785",      //"0xa2AEf78BD851D65cdBD3F14d3Bf814C211a50630",
+    "abi" : require("../build/deployments/42/0x5CD98cDD838174E9523e561887E13A5123211785.json")["abi"]
 }
 
 

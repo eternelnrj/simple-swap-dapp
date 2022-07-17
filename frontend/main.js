@@ -30,7 +30,7 @@ async function swap() {
     }
     
   else {
-    const minAmountPurchasedToken = parseFloat(document.getElementById("min_amount_purchased_token").getAttribute('data-value'));
+    const minAmountPurchasedToken = parseFloat(document.getElementById("min-amount-purchased-token").getAttribute('data-value'));
 
     const numberDecimalsSoldToken = (tokenForSale == 0) ? 18 : 6;
     const numberDecimalsPurchasedToken = (tokenForSale == 0) ? 6 : 18;

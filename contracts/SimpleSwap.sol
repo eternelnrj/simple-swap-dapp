@@ -48,8 +48,8 @@ contract SimpleSwap is Ownable {
         userToAmountLpTokens[msg.sender] = userToAmountLpTokens[msg.sender].add(totalLpTokens);
     }
 
-    function swap(uint256 quantitySoldToken, uint256 minAmountPurchasedToken, Token tokenForSale) public {
-        require(isPoolInitialized, "The pool should be initialized first.");
+    function swap(uint256 quantitySoldToken, uint256 minAmountPurchasedToken, Token tokenForSale) public onlyAfterInitialization {
+        //require(isPoolInitialized, "The pool should be initialized first.");
         require(quantitySoldToken > 0, "The amount to sell should be strictly bigger than 0.");
         uint256 amountPurchasedToken = getAmountPurchasedToken(quantitySoldToken, tokenForSale);
         require(amountPurchasedToken >= minAmountPurchasedToken, "The amount of purchased token is lower than required.");
@@ -77,8 +77,8 @@ contract SimpleSwap is Ownable {
         require(soldToken.transferFrom(msg.sender, address(this), quantitySoldToken), "Transfer of the amount of token you want to sell failed.");
     }
 
-    function supply(uint256 amountLpTokens) public {
-        require(isPoolInitialized, "The pool should be initialized first.");
+    function supply(uint256 amountLpTokens) public onlyAfterInitialization {
+        //require(isPoolInitialized, "The pool should be initialized first.");
         require(amountLpTokens > 0, "The amount of supplied lp tokens should be > 0.");
         (uint256 amountLinkPerLpToken, uint256 amountUsdcPerLpToken) = getLpTokenPrice();
 
@@ -99,8 +99,8 @@ contract SimpleSwap is Ownable {
         require(USDC.transferFrom(msg.sender, address(this), amountUSDCToSupply), "Transfer of USDC failed.");
     }
 
-    function withdraw(uint256 amountLpTokens) public {
-        require(isPoolInitialized, "The pool should be initialized first.");
+    function withdraw(uint256 amountLpTokens) public onlyAfterInitialization {
+        //require(isPoolInitialized, "The pool should be initialized first.");
         require(amountLpTokens > 0, "The amount of requested lp tokens should be > 0.");
         require(userToAmountLpTokens[msg.sender] >= amountLpTokens, "You don't have enough lp tokens.");
         (uint256 amountLinkPerLpToken, uint256 amountUSDCPerLpToken)  = getLpTokenPrice();
@@ -135,11 +135,16 @@ contract SimpleSwap is Ownable {
         return amountPurchasedTokens.mul(10 ** 6 - FEE).div(10 ** 6);
     }
 
-    function getLpTokenPrice() public view returns(uint256, uint256) 
+    function getLpTokenPrice() public onlyAfterInitialization view returns(uint256, uint256) 
     {
         return (totalAvailableLink.mul(10 ** 6).div(totalLpTokens), totalAvailableUSDC.mul(10 ** 6).div(totalLpTokens));
     }
 
+
+    modifier onlyAfterInitialization {
+        require(isPoolInitialized, "The pool should be initialized first.");
+        _;
+    }
 }
 
 

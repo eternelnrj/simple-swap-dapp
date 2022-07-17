@@ -1,5 +1,5 @@
 #### Decentralized AMM App.
-A simple decentralized application that allows exchange `Link` for `USDC` and vice-versa as well as provide liquidity to receive fees from swaps. The smart contracts are written in `solidity`, and for the frontend we use `html+javascript` combined with `Moralis` to interact with smart contracts.
+A simple decentralized application that allows exchange `Link` for `USDC` and vice-versa as well as provide liquidity to receive fees from swaps. The smart contracts are written in `solidity`, and for the frontend we use `html+javascript` combined with `Moralis` to interact with smart contracts. In this simple version lp tokens are not minted.
 
 
 #### Launch.

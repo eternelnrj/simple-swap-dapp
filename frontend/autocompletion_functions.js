@@ -25,15 +25,16 @@ async function changeLinkInput(tokenForSale) {
     }
 }
   
-function changeMinAmountReceived(tokenForSale){
+function changeMinAmountReceived(tokenForSale) {
     const amountOfPurchasedToken = (tokenForSale == 0) ? parseFloat(document.getElementById("usdc-input").value) : parseFloat(document.getElementById("link-input").value);
     const maxSlippage = parseFloat(document.getElementById("slippage").value);
     const minAmountPurchasedToken = amountOfPurchasedToken * (1 - maxSlippage/100);
   
     const tokenPurchasedStr = (tokenForSale == 0) ? "USDC" : "Link";
   
-    document.getElementById("min_amount_purchased_token").innerHTML = "Minimum amount of " +  tokenPurchasedStr + " to receive: " + minAmountPurchasedToken.toFixed(NUMBER_DECIMALS).toString();
-    document.getElementById("min_amount_purchased_token").setAttribute("data-value", minAmountPurchasedToken);
+    document.getElementById("min-amount-purchased-token").innerHTML = "Minimum amount of " +  tokenPurchasedStr + " to receive: " + 
+                                                                      minAmountPurchasedToken.toFixed(NUMBER_DECIMALS).toString();
+    document.getElementById("min-amount-purchased-token").setAttribute("data-value", minAmountPurchasedToken);
   }
   
 async function changeAmountUsdcToSupply() {
